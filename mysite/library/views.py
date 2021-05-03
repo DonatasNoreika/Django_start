@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.views import generic
 
 # Create your views here.
 
@@ -41,3 +42,12 @@ def authors(request):
 def author(request, author_id):
     single_author = get_object_or_404(Author, pk=author_id)
     return render(request, 'author.html', {'author': single_author})
+
+class BookListView(generic.ListView):
+    model = Book
+    template_name = 'book_list.html'
+
+
+class BookDetailView(generic.DetailView):
+    model = Book
+    template_name = 'book_detail.html'
