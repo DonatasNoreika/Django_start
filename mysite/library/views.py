@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 # Create your views here.
 
@@ -31,9 +33,11 @@ def index(request):
 
 
 def authors(request):
-    authors = Author.objects.all()
+    paginator = Paginator(Author.objects.all(), 2)
+    page_number = request.GET.get('page')
+    paged_authors = paginator.get_page(page_number)
     context = {
-        'authors': authors
+        'authors': paged_authors
     }
     # print(authors)
     return render(request, 'authors.html', context=context)
@@ -45,9 +49,21 @@ def author(request, author_id):
 
 class BookListView(generic.ListView):
     model = Book
+    paginate_by = 2
     template_name = 'book_list.html'
 
 
 class BookDetailView(generic.DetailView):
     model = Book
     template_name = 'book_detail.html'
+
+def search(request):
+    """
+    paprasta paieška. query ima informaciją iš paieškos laukelio,
+    search_results prafiltruoja pagal įvestą tekstą knygų pavadinimus ir aprašymus.
+    Icontains nuo contains skiriasi tuo, kad icontains ignoruoja ar raidės
+    didžiosios/mažosios.
+    """
+    query = request.GET.get('query')
+    search_results = Book.objects.filter(Q(title__icontains=query) | Q(summary__icontains=query))
+    return render(request, 'search.html', {'books': search_results, 'query': query})
