@@ -19,7 +19,7 @@ class AuthorAdmin(admin.ModelAdmin):
 
 
 class BookInstanceAdmin(admin.ModelAdmin):
-    list_display = ('book', 'status', 'due_back', 'id')
+    list_display = ('book', 'status', 'reader', 'due_back', 'id')
     list_editable = ('due_back', 'status')
     list_filter = ('status', 'due_back')
     search_fields = ('id', 'book__title')
@@ -29,7 +29,7 @@ class BookInstanceAdmin(admin.ModelAdmin):
             'fields': ('book', 'id')
         }),
         ('Availability', {
-            'fields': ('status', 'due_back')
+            'fields': ('status', 'due_back', 'reader')
         }),
     )
 
