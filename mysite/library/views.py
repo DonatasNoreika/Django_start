@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, reverse
 from django.views import generic
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -14,6 +14,8 @@ from django.contrib import messages
 from django.http import HttpResponse
 from .models import Book, Author, BookInstance, Genre
 
+from .forms import BookReviewForm
+from django.views.generic.edit import FormMixin
 
 def index(request):
     # Suskaičiuokime keletą pagrindinių objektų
@@ -64,9 +66,39 @@ class BookListView(generic.ListView):
     template_name = 'book_list.html'
 
 
-class BookDetailView(generic.DetailView):
+class BookDetailView(FormMixin, generic.DetailView):
     model = Book
     template_name = 'book_detail.html'
+    form_class = BookReviewForm
+
+    class Meta:
+        ordering = ['title']
+
+    # nurodome, kur atsidursime komentaro sėkmės atveju.
+    def get_success_url(self):
+        return reverse('book-detail', kwargs={'pk': self.object.id})
+
+    # įtraukiame formą į kontekstą, inicijuojame pradinę 'book' reikšmę.
+    def get_context_data(self, *args, **kwargs):
+        context = super(BookDetailView, self).get_context_data(**kwargs)
+        context['form'] = BookReviewForm(initial={'book': self.object})
+        return context
+
+    # standartinis post metodo perrašymas, naudojant FormMixin, galite kopijuoti tiesiai į savo projektą.
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    # štai čia nurodome, kad knyga bus būtent ta, po kuria komentuojame, o vartotojas bus tas, kuris yra prisijungęs.
+    def form_valid(self, form):
+        form.instance.book = self.object
+        form.instance.reviewer = self.request.user
+        form.save()
+        return super(BookDetailView, self).form_valid(form)
 
 def search(request):
     """
