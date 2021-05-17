@@ -17,6 +17,8 @@ from .models import Book, Author, BookInstance, Genre
 from .forms import BookReviewForm
 from django.views.generic.edit import FormMixin
 
+from django.contrib.auth.decorators import login_required
+
 def index(request):
     # Suskaičiuokime keletą pagrindinių objektų
     num_books = Book.objects.all().count()
@@ -148,3 +150,9 @@ def register(request):
             messages.error(request, 'Slaptažodžiai nesutampa!')
             return redirect('register')
     return render(request, 'register.html')
+
+
+
+@login_required
+def profilis(request):
+    return render(request, 'profilis.html')
