@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 {% load crispy_forms_tags %}
-
+{% load static %}
     <div class="content-section">
       <div class="media">
         <div class="media-body">
@@ -19,7 +19,7 @@
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Atnaujinti</button>
             </div>
-        </form>          {% load static %}
+        </form>
             {% if user.profilis.nuotrauka %}
         <img class="rounded-circle account-img" src="{{ user.profilis.nuotrauka.url }}">
             {% else %}
