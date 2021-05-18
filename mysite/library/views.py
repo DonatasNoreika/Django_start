@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, reverse
-from django.views import generic
+from django.views.generic import (ListView,
+                                  DetailView)
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -63,13 +64,13 @@ def author(request, author_id):
     single_author = get_object_or_404(Author, pk=author_id)
     return render(request, 'author.html', {'author': single_author})
 
-class BookListView(generic.ListView):
+class BookListView(ListView):
     model = Book
     paginate_by = 2
     template_name = 'book_list.html'
 
 
-class BookDetailView(FormMixin, generic.DetailView):
+class BookDetailView(FormMixin, DetailView):
     model = Book
     template_name = 'book_detail.html'
     form_class = BookReviewForm
@@ -115,14 +116,19 @@ def search(request):
     return render(request, 'search.html', {'books': search_results, 'query': query})
 
 
-class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+class LoanedBooksByUserListView(LoginRequiredMixin, ListView):
     model = BookInstance
+    context_object_name = 'books'
     template_name = 'user_books.html'
     paginate_by = 10
 
     def get_queryset(self):
         return BookInstance.objects.filter(reader=self.request.user).filter(status__exact='p').order_by('due_back')
 
+
+class BookByUserDetailView(LoginRequiredMixin, DetailView):
+    model = BookInstance
+    template_name = 'user_book.html'
 
 @csrf_protect
 def register(request):
