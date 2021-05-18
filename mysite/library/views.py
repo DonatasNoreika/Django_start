@@ -3,7 +3,8 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import (ListView,
                                   DetailView,
                                   CreateView,
-                                  UpdateView)
+                                  UpdateView,
+                                  DeleteView)
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -154,6 +155,15 @@ class BookByUserUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         form.instance.reader = self.request.user
         return super().form_valid(form)
+
+    def test_func(self):
+        book = self.get_object()
+        return self.request.user == book.reader
+
+class BookByUserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = BookInstance
+    success_url = "/library/mybooks/"
+    template_name = 'user_book_delete.html'
 
     def test_func(self):
         book = self.get_object()
