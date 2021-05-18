@@ -12,6 +12,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('mybooks/', views.LoanedBooksByUserListView.as_view(), name='my-borrowed'),
     path('mybooks/<uuid:pk>', views.BookByUserDetailView.as_view(), name='my-book'),
+    path('mybooks/new', views.BookByUserCreateView.as_view(), name='my-borrowed-new'),
     path('register/', views.register, name='register'),
     path('profilis/', views.profilis, name='profilis'),
     path('i18n/', include('django.conf.urls.i18n')),
